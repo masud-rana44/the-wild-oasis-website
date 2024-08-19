@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "Profile | The Wild Oasis",
+};
+
 export default function Page() {
   // CHANGE
   const countryFlag = "pt.jpg";
