@@ -3,7 +3,6 @@ import { getCabins } from "@/app/_lib/data-service";
 
 async function CabinList() {
   const cabins = await getCabins();
-  console.log(cabins);
 
   return (
     <div>
