@@ -178,7 +178,6 @@ export async function createBooking(newBooking) {
   return data;
 }
 
-/////////////
 // UPDATE
 
 // The updatedFields is an object which should ONLY contain the updated data
