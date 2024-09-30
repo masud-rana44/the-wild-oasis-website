@@ -1,7 +1,10 @@
 import Image from "next/image";
-import { getCabin, getCabins } from "@/app/_lib/data-service";
-import { EyeSlashIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { Suspense } from "react";
+import Spinner from "@/app/_components/Spinner";
+import { getCabin } from "@/app/_lib/data-service";
+import Reservations from "@/app/_components/Reservations";
 import TextExpander from "@/app/_components/TextExpander";
+import { EyeSlashIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/solid";
 
 export async function generateMetadata({ params }) {
   const { cabinId } = params;
@@ -24,7 +27,12 @@ export async function generateMetadata({ params }) {
 
 export default async function Page({ params }) {
   const { cabinId } = params;
+
+  // BAD IDEA: This will request after one another which is slow
   const cabin = await getCabin(cabinId);
+  // const settings = await getSettings();
+  // const bookedDates = await getBookedDatesByCabinId(cabinId);
+
   const { id, name, maxCapacity, regularPrice, discount, image, description } =
     cabin;
 
@@ -75,9 +83,13 @@ export default async function Page({ params }) {
       </div>
 
       <div>
-        <h2 className="text-5xl font-semibold text-center">
-          Reserve today. Pay on arrival.
+        <h2 className="text-5xl font-semibold text-center text-accent-400 mb-10">
+          Reserve {name} today. Pay on arrival.
         </h2>
+
+        <Suspense fallback={<Spinner />}>
+          <Reservations cabin={cabin} />
+        </Suspense>
       </div>
     </div>
   );
