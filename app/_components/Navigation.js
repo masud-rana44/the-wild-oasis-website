@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { auth } from "../_lib/auth";
-import Image from "next/image";
 
 export default async function Navigation() {
   const session = await auth();
