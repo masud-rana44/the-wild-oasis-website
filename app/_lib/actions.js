@@ -3,6 +3,28 @@
 import { supabase } from "./supabase";
 import { auth, signIn, signOut } from "./auth";
 import { revalidatePath } from "next/cache";
+import { getBookings } from "./data-service";
+
+export async function deleteReservation(bookingId) {
+  const session = await auth();
+  if (!session)
+    throw new Error("You must be logged in to delete a reservation.");
+
+  const guestBookings = getBookings(session.user.guestId);
+  const guestBookingIds = await guestBookings.map((booking) => booking.id);
+
+  if (!guestBookingIds.includes(bookingId))
+    throw new Error("You don't have permission to delete this reservation.");
+
+  const { error } = await supabase
+    .from("bookings")
+    .delete()
+    .eq("id", bookingId);
+
+  if (error) throw new Error("Reservation could not be deleted.");
+
+  revalidatePath("/account/reservations");
+}
 
 export async function updateGuestProfile(formData) {
   const session = await auth();
