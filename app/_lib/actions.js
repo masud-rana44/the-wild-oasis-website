@@ -3,9 +3,36 @@
 import { supabase } from "./supabase";
 import { auth, signIn, signOut } from "./auth";
 import { revalidatePath } from "next/cache";
-import { getBookings } from "./data-service";
+import { getBooking, getBookings } from "./data-service";
+import { redirect } from "next/navigation";
 
-export async function deleteReservation(bookingId) {
+export async function updateBooking(formData) {
+  const session = await auth();
+  if (!session) throw new Error("You must be logged in to update a reservation.");
+
+  const bookingId = formData.get("bookingId");
+  const numGuests = formData.get("numGuests");
+  const observations = formData.get("observations");
+  
+  const booking = await getBooking(bookingId)
+
+   if (!booking) throw new Error("Booking not found");
+
+  const { error } = await supabase
+    .from("bookings")
+    .update({ numGuests, observations })
+    .eq("id", bookingId)
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not be updated");
+  }
+
+  redirect("/account/reservations");
+
+}
+
+export async function deleteBooking(bookingId) {
   const session = await auth();
   if (!session)
     throw new Error("You must be logged in to delete a reservation.");
