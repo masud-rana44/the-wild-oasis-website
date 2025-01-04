@@ -1,9 +1,10 @@
+import SubmitButton from "@/app/_components/SubmitButton";
 import { updateBooking } from "@/app/_lib/actions";
 import { getBooking, getCabin } from "@/app/_lib/data-service";
 
 export default async function Page({ params}) {
   const { bookingId } = params;
-  const { cabinId } = await getBooking(bookingId)
+  const { cabinId, numGuests, observations } = await getBooking(bookingId)
   const { maxCapacity } = await getCabin(cabinId);
 
   return (
@@ -20,6 +21,7 @@ export default async function Page({ params}) {
           <select
             name="numGuests"
             id="numGuests"
+            defaultValue={numGuests}
             className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
             required
           >
@@ -40,16 +42,18 @@ export default async function Page({ params}) {
           </label>
           <textarea
             name="observations"
+            defaultValue={observations}
             className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
           />
         </div>
 
         <div className="flex justify-end items-center gap-6">
-          <button className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
-            Update reservation
-          </button>
+         <SubmitButton pendingLabel="Updating...">
+          Update Reservation
+         </SubmitButton>
         </div>
       </form>
     </div>
   );
 }
+

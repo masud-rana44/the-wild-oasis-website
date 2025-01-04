@@ -7,29 +7,39 @@ import { getBooking, getBookings } from "./data-service";
 import { redirect } from "next/navigation";
 
 export async function updateBooking(formData) {
+  const bookingId = Number(formData.get("bookingId"));
+
+  // 1) Authentication
   const session = await auth();
-  if (!session) throw new Error("You must be logged in to update a reservation.");
+  if (!session)
+    throw new Error("You must be logged in to delete a reservation.");
 
-  const bookingId = formData.get("bookingId");
-  const numGuests = formData.get("numGuests");
-  const observations = formData.get("observations");
-  
-  const booking = await getBooking(bookingId)
+  // 2) Authorization
+  const guestBookings = await getBookings(session.user.guestId);
+  const guestBookingIds = guestBookings.map((booking) => booking.id);
 
-   if (!booking) throw new Error("Booking not found");
+  if (!guestBookingIds.includes(bookingId))
+    throw new Error("You don't have permission to update this reservation.");
 
+  // 3) Mutation
+  const updatedData = {
+    numGuests: Number(formData.get("numGuests")),
+    observations: formData.get("observations").slice(0, 1000),
+  }
   const { error } = await supabase
     .from("bookings")
-    .update({ numGuests, observations })
+    .update(updatedData)
     .eq("id", bookingId)
 
+// 4) Error handling
   if (error) {
     console.error(error);
     throw new Error("Booking could not be updated");
   }
 
+  // 5) Redirect & Revalidate
+  revalidatePath(`/account/reservations/edit/${bookingId}`)
   redirect("/account/reservations");
-
 }
 
 export async function deleteBooking(bookingId) {
