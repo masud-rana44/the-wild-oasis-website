@@ -14,7 +14,11 @@ async function Reservations({ cabin }) {
 
   return (
     <div className="grid grid-cols-1 min-h-[800px] border border-primary-800">
-      <DateSelector cabin={cabin} settings={settings} />
+      <DateSelector
+        cabin={cabin}
+        bookedDates={bookedDates}
+        settings={settings}
+      />
       {session?.user ? (
         <ReservationForm cabin={cabin} user={session.user} />
       ) : (
